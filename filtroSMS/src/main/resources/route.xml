@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ASCII"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route>
+    <from uri="switchyard://FiltroSMS"/>
+    <log message="Filtro: ${body}"/>
+    <to uri="switchyard://JMSEntrada" />
+  </route>
+</routes>

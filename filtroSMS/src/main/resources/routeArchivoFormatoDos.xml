@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<routes xmlns="http://camel.apache.org/schema/spring">
+  <route>
+    <from uri="switchyard://ArchivoFormatoDosFS"/>
+    <log message="ArchivoFormatoDosFS - message received: ${body}"/>
+    <split>
+    	<tokenize token="\n" />
+    	<log message="${body}" />
+    	<to uri="switchyard://InterpreteArchivoFormatoDos"/>
+    	<to uri="switchyard://FiltroSMS"/>
+    </split>      
+  </route>
+</routes>

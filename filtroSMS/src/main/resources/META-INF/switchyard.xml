@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sy:switchyard xmlns:bean="urn:switchyard-component-bean:config:1.1" xmlns:camel="urn:switchyard-component-camel:config:1.1" xmlns:file="urn:switchyard-component-camel-file:config:1.1" xmlns:jms="urn:switchyard-component-camel-jms:config:1.1" xmlns:resteasy="urn:switchyard-component-resteasy:config:1.1" xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912" xmlns:sy="urn:switchyard-config:switchyard:1.1" name="filtroSMS" targetNamespace="urn:com.visionbanco.fsw:filtroSMS:1.0">
+  <sca:composite name="filtroSMS" targetNamespace="urn:com.visionbanco.fsw:filtroSMS:1.0">
+    <sca:component name="Route">
+      <camel:implementation.camel>
+        <camel:xml path="route.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="FiltroSMS">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.interno.FiltroSMSCamel"/>
+      </sca:service>
+      <sca:reference name="JMSEntrada">
+        <sy:interface.esb inputType="java:com.visionbanco.fsw.filtroSMS.dto.MensajeSMS"/>
+      </sca:reference>
+    </sca:component>
+    <sca:reference name="JMSEntrada" multiplicity="0..1" promote="Route/JMSEntrada">
+      <sy:interface.esb inputType="java:java.lang.String"/>
+      <jms:binding.jms name="jms1">
+        <jms:queue>filtroSMS</jms:queue>
+        <jms:connectionFactory>#ConnectionFactory</jms:connectionFactory>
+        <jms:disableReplyTo>true</jms:disableReplyTo>
+      </jms:binding.jms>
+    </sca:reference>
+    <sca:component name="RouteEnvio">
+      <camel:implementation.camel>
+        <camel:xml path="routeEnvio.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="JMSSalida">
+        <sy:interface.esb inputType="java:java.lang.String"/>
+      </sca:service>
+      <sca:reference name="SMSREST">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.out.SMSREST"/>
+      </sca:reference>
+    </sca:component>
+    <sca:component name="RouteXML">
+      <camel:implementation.camel>
+        <camel:xml path="routeXML.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="XMLREST">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.XMLREST"/>
+      </sca:service>
+      <sca:reference name="FiltroSMS">
+        <sy:interface.esb inputType="java:com.visionbanco.fsw.filtroSMS.dto.MensajeXML"/>
+      </sca:reference>
+    </sca:component>
+    <sca:service name="XMLREST" promote="RouteXML/XMLREST">
+      <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.XMLREST"/>
+      <resteasy:binding.rest name="rest1">
+        <resteasy:interfaces>com.visionbanco.fsw.filtroSMS.interfaces.in.XMLREST</resteasy:interfaces>
+        <resteasy:contextPath>filtroSMS/xml</resteasy:contextPath>
+      </resteasy:binding.rest>
+    </sca:service>
+    <sca:component name="RouteMockSMS">
+      <camel:implementation.camel>
+        <camel:xml path="routeMockSMS.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="MockSMSREST">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.MockSMSREST"/>
+      </sca:service>
+    </sca:component>
+    <sca:service name="MockSMSREST" promote="RouteMockSMS/MockSMSREST">
+      <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.MockSMSREST"/>
+      <resteasy:binding.rest name="rest1">
+        <resteasy:interfaces>com.visionbanco.fsw.filtroSMS.interfaces.in.MockSMSREST</resteasy:interfaces>
+        <resteasy:contextPath>${SERVICIO_SMS}</resteasy:contextPath>
+      </resteasy:binding.rest>
+    </sca:service>
+    <sca:service name="JMSSalida" promote="RouteEnvio/JMSSalida">
+      <sy:interface.esb inputType="java:java.lang.String"/>
+      <jms:binding.jms name="jms1">
+        <jms:queue>filtroSMS</jms:queue>
+        <jms:connectionFactory>#ConnectionFactory</jms:connectionFactory>
+      </jms:binding.jms>
+    </sca:service>
+    <sca:reference name="SMSREST" multiplicity="0..1" promote="RouteEnvio/SMSREST">
+      <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.out.SMSREST"/>
+      <resteasy:binding.rest name="rest1">
+        <resteasy:interfaces>com.visionbanco.fsw.filtroSMS.interfaces.out.SMSREST</resteasy:interfaces>
+        <resteasy:address>http://localhost:8080/${SERVICIO_SMS}</resteasy:address>
+        <resteasy:timeout>10000</resteasy:timeout>
+      </resteasy:binding.rest>
+    </sca:reference>
+    <sca:component name="RouteArchivoFormatoUno">
+      <camel:implementation.camel>
+        <camel:xml path="routeArchivoFormatoUno.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="ArchivoFormatoUnoFS">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.ArchivoFormatoUnoFS"/>
+      </sca:service>
+      <sca:reference name="FiltroSMS">
+        <sy:interface.esb inputType="java:com.visionbanco.fsw.filtroSMS.dto.MensajeArchivoFormatoUno"/>
+      </sca:reference>
+      <sca:reference name="InterpreteArchivoFormatoUno">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.interno.InterpreteArchivoFormatoUno"/>
+      </sca:reference>
+    </sca:component>
+    <sca:service name="ArchivoFormatoUnoFS" promote="RouteArchivoFormatoUno/ArchivoFormatoUnoFS">
+      <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.ArchivoFormatoUnoFS"/>
+      <file:binding.file name="file1">
+        <sy:operationSelector operationName="procesar"/>
+        <file:directory>C:/cursoFSW/entrada/formatoUno</file:directory>
+        <file:consume>
+          <file:delete>true</file:delete>
+        </file:consume>
+      </file:binding.file>
+    </sca:service>
+    <sca:component name="InterpreteArchivoFormatoUnoBean">
+      <bean:implementation.bean class="com.visionbanco.fsw.filtroSMS.beans.InterpreteArchivoFormatoUnoBean"/>
+      <sca:service name="InterpreteArchivoFormatoUno">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.interno.InterpreteArchivoFormatoUno"/>
+      </sca:service>
+    </sca:component>
+    <sca:component name="RouteArchivoFormatoDos">
+      <camel:implementation.camel>
+        <camel:xml path="routeArchivoFormatoDos.xml"/>
+      </camel:implementation.camel>
+      <sca:service name="ArchivoFormatoDosFS">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.ArchivoFormatoDosFS"/>
+      </sca:service>
+      <sca:reference name="FiltroSMS">
+        <sy:interface.esb inputType="java:com.visionbanco.fsw.filtroSMS.dto.MensajeArchivoFormatoDos"/>
+      </sca:reference>
+      <sca:reference name="InterpreteArchivoFormatoDos">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.interno.InterpreteArchivoFormatoDos"/>
+      </sca:reference>
+    </sca:component>
+    <sca:service name="ArchivoFormatoDosFS" promote="RouteArchivoFormatoDos/ArchivoFormatoDosFS">
+      <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.ArchivoFormatoDosFS"/>
+      <file:binding.file name="file1">
+        <file:directory>C:/cursoFSW/entrada/formatoDos</file:directory>
+        <file:consume>
+          <file:delete>true</file:delete>
+        </file:consume>
+      </file:binding.file>
+    </sca:service>
+    <sca:component name="InterpreteArchivoFormatoDosBean">
+      <bean:implementation.bean class="com.visionbanco.fsw.filtroSMS.beans.InterpreteArchivoFormatoDosBean"/>
+      <sca:service name="InterpreteArchivoFormatoDos">
+        <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.interno.InterpreteArchivoFormatoDos"/>
+      </sca:service>
+    </sca:component>
+  </sca:composite>
+</sy:switchyard>
