@@ -4,10 +4,10 @@
     <from uri="switchyard://ArchivoFormatoUnoFS"/>
     <log message="ArchivoFormatoUnoFS - message received: ${body}"/>
     <split>
-    	<tokenize token="\n" />
-    	<log message="${body}" />
-    	<to uri="switchyard://InterpreteArchivoFormatoUno"/>
-    	<to uri="switchyard://FiltroSMS"/>
-    </split>    
+      <tokenize token="\n"></tokenize>
+      <log message="${body}"/>
+      <to uri="switchyard://InterpreteArchivoFormatoUno"/>
+      <to uri="switchyard://FiltroSMS"/>
+    </split>
   </route>
 </routes>

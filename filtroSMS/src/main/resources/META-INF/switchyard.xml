@@ -59,10 +59,6 @@
     </sca:component>
     <sca:service name="MockSMSREST" promote="RouteMockSMS/MockSMSREST">
       <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.in.MockSMSREST"/>
-      <resteasy:binding.rest name="rest1">
-        <resteasy:interfaces>com.visionbanco.fsw.filtroSMS.interfaces.in.MockSMSREST</resteasy:interfaces>
-        <resteasy:contextPath>${SERVICIO_SMS}</resteasy:contextPath>
-      </resteasy:binding.rest>
     </sca:service>
     <sca:service name="JMSSalida" promote="RouteEnvio/JMSSalida">
       <sy:interface.esb inputType="java:java.lang.String"/>
@@ -75,7 +71,7 @@
       <sca:interface.java interface="com.visionbanco.fsw.filtroSMS.interfaces.out.SMSREST"/>
       <resteasy:binding.rest name="rest1">
         <resteasy:interfaces>com.visionbanco.fsw.filtroSMS.interfaces.out.SMSREST</resteasy:interfaces>
-        <resteasy:address>http://localhost:8080/${SERVICIO_SMS}</resteasy:address>
+        <resteasy:address>${SERVICIO_SMS}</resteasy:address>
         <resteasy:timeout>10000</resteasy:timeout>
       </resteasy:binding.rest>
     </sca:reference>

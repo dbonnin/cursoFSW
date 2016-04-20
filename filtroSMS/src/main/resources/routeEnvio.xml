@@ -3,5 +3,6 @@
   <route>
     <from uri="switchyard://JMSSalida"/>
     <log message="Envio - message received: ${body}"/>
+    <to uri="switchyard://SMSREST" />
   </route>
 </routes>

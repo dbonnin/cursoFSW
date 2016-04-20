@@ -18,7 +18,6 @@ public class InterpreteArchivoFormatoDosBean implements
 		m.nroDoc=mensaje.substring(2, 13);
 		m.texto=mensaje.substring(14);
 		
-		
 		if("9".equals(m.tipoDoc)) m.tipoDoc="RUC";
 		else if("1".equals(m.tipoDoc)) m.tipoDoc="CI";
 		
